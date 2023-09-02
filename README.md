@@ -1,2 +1,2 @@
-# Flurn_Backend_Assignement
+# Flurn_Backend_Assignment
 Booking service API's
