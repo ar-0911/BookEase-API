@@ -40,9 +40,9 @@ class SeatsModel(db.Model):
                 continue
             if column.name == 'status':
                 if getattr(self, column.name) == 0:
-                    result = 'False'
+                    result = False
                 else:
-                    result = 'True'
+                    result = True
                 dictionary['is_booked'] = result
             else:
                 dictionary[column.name] = getattr(self, column.name)
@@ -68,17 +68,23 @@ def get_price(id):
     percentage = booked / total_class_seats
     if percentage < 0.4:
         price = db.session.execute(db.select(SeatsPricing.min_price).where(SeatsPricing.seat_class == seat_class))
-        if price.scalar() is None:
-            price = db.session.execute(
+        price_val = price.scalar()
+        if price_val is not None:
+            return price_val
+        price = db.session.execute(
                 db.select(SeatsPricing.normal_price).where(SeatsPricing.seat_class == seat_class))
     elif 0.4 <= percentage <= 0.6:
         price = db.session.execute(db.select(SeatsPricing.normal_price).where(SeatsPricing.seat_class == seat_class))
-        if price.scalar() is None:
-            price = db.session.execute(db.select(SeatsPricing.max_price).where(SeatsPricing.seat_class == seat_class))
+        price_val = price.scalar()
+        if price_val is not None:
+            return price_val
+        price = db.session.execute(db.select(SeatsPricing.max_price).where(SeatsPricing.seat_class == seat_class))
     else:
         price = db.session.execute(db.select(SeatsPricing.max_price).where(SeatsPricing.seat_class == seat_class))
-        if price.Scalar() is None:
-            price = db.session.execute(db.select(SeatsPricing.normal_price).where(SeatsPricing.seat_class == seat_class))
+        price_val = price.scalar()
+        if price_val is not None:
+            return price_val
+        price = db.session.execute(db.select(SeatsPricing.normal_price).where(SeatsPricing.seat_class == seat_class))
     return price.scalar()
 
 
