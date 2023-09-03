@@ -168,9 +168,11 @@ def retrieve_bookings():
         if booking_id.scalar() is None:
             return jsonify({'Error': 'User has no bookings'})
         else:
-            b_id = db.session.execute(db.select(Booking.BookingID).where(Booking.Ph_no == user_identifier)).scalar()
-            result = db.session.execute(db.select(SeatsModel).where(SeatsModel.Booking_ID == b_id))
-            all_seats = result.scalars()
+            b_id = db.session.execute(db.select(Booking.BookingID).where(Booking.Ph_no == user_identifier)).scalars()
+            all_seats=[]
+            for item in b_id:
+                result = db.session.execute(db.select(SeatsModel).where(SeatsModel.Booking_ID == item))
+                all_seats += result.scalars()
             return jsonify(seats=[seat.to_dict() for seat in all_seats])
     else:
         return jsonify(response={'Error': 'Invalid User Identifier'})
