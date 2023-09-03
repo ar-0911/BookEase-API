@@ -121,7 +121,7 @@ def book():
     for item in id_list:
         is_booked = db.session.execute(db.select(SeatsModel.status).where(SeatsModel.id == item)).scalar()
         if is_booked == 1:
-            return jsonify(response={"Failed": f"Seat {item} already Booked"})
+            return jsonify(response={"Failed": f"Seat {item} already Booked"}), 400
         price += float(get_price(item)[1:])
 
         if count == 0:
@@ -134,7 +134,7 @@ def book():
             count += 1
         seat = db.session.execute(db.select(SeatsModel.id).where(SeatsModel.id == item))
         if seat.scalar() is None:
-            return jsonify(response={"Failed": f"Seat {item} does not exist"})
+            return jsonify(response={"Failed": f"Seat {item} does not exist"}), 404
         seat = db.get_or_404(SeatsModel, item)
         seat.status = 1
         list_seats.append(item)
@@ -162,11 +162,11 @@ def book():
 def retrieve_bookings():
     user_identifier = request.args.get('userIdentifier')
     if not user_identifier:
-        return jsonify(response={'error': 'User Identifier not provided'})
+        return jsonify({'error': 'User Identifier not provided'}), 400
     if user_identifier.isnumeric():
         booking_id = db.session.execute(db.select(Booking.BookingID).where(Booking.Ph_no == user_identifier))
         if booking_id.scalar() is None:
-            return jsonify({'Error': 'User has no bookings'})
+            return jsonify({'Error': 'User has no bookings'}), 404
         else:
             b_id = db.session.execute(db.select(Booking.BookingID).where(Booking.Ph_no == user_identifier)).scalars()
             all_seats=[]
@@ -175,7 +175,7 @@ def retrieve_bookings():
                 all_seats += result.scalars()
             return jsonify(seats=[seat.to_dict() for seat in all_seats])
     else:
-        return jsonify(response={'Error': 'Invalid User Identifier'})
+        return jsonify({'Error': 'Invalid User Identifier'}), 400
 
 
 if __name__ == "__main__":
