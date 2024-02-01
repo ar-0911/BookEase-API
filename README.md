@@ -1,2 +1,2 @@
-# Flurn_Backend_Assignment
+# BookEase API
 Booking service API's
