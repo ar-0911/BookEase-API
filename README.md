@@ -1,2 +1,2 @@
 # BookEase API
-Booking service API's
+Documentation: https://documenter.getpostman.com/view/29476665/2s9Y5eLdxh
