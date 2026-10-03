@@ -2,7 +2,6 @@ import os
 
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from twilio.rest import Client
 import smtplib
 
 app = Flask(__name__)
@@ -10,11 +9,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+os.path.join(basedir,'seatInfo.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-# account_sid = 'ACf28871518b6d85b13347e0e6ad4c5011'
-# auth_token = 'a142e32767278832adb825a7a83a3dac'
-my_email = 'pythonsmtp58@gmail.com'
-password = 'xjcxqljmcizxyrbl'
-# 8884230038
+# SMTP credentials for booking confirmation emails, e.g. a Gmail app password
+my_email = os.environ['SMTP_USER']
+password = os.environ['SMTP_PASSWORD']
 # Reflect tables from the database
 with app.app_context():
     db.Model.metadata.reflect(db.engine)
@@ -142,10 +139,6 @@ def book():
         seat.Booking_ID = last_row.BookingID
 
     booking_id = db.session.query(Booking).order_by(Booking.BookingID.desc()).first().BookingID
-    # twillio_client = Client(account_sid, auth_token,)
-    # message = twillio_client.messages.create(body=f'Booking Confirmed \nBooking ID: {booking_id}\nSeats: {id1}',
-    #                                  from_='+16562162318',
-    #                                  to='+918884230038')
     receiver_email = request.args.get('email')
     with smtplib.SMTP('smtp.gmail.com', port=587) as connection:
         connection.starttls()
